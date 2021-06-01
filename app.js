@@ -4,10 +4,15 @@
 const express = require("express");
 
 const app = express();
-const ExpressError = require("./expressError")
+const ExpressError = require("./expressError");
+const comRoutes = require("./routes/companies");
+const inRoutes = require("./routes/invoices");
 
 app.use(express.json());
 
+
+app.use("/companies", comRoutes);
+app.use("/invoices", inRoutes);
 
 /** 404 handler */
 
@@ -26,6 +31,5 @@ app.use((err, req, res, next) => {
     message: err.message
   });
 });
-
 
 module.exports = app;

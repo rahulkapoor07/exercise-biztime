@@ -25,33 +25,64 @@ router.get("/:code", async (req, res, next)=>{
 }
 });
 
-router.post("/", async (req, res, next)=>{
+// router.post("/", async (req, res, next)=>{
+//     try{
+//     const { code, name, description } = req.body;
+//     if (!code && !name && !description){
+//         throw new ExpressError("please provide code, name and description", 404);
+//     }
+//     if (!code){
+//         throw new ExpressError(`Please provide code`, 404);
+//     }
+//     let lowerCaseCode = code.toLowerCase();
+//     const test = await db.query(`SELECT code FROM companies WHERE code=$1`, [lowerCaseCode]);
+//     if (lowerCaseCode == test.rows[0].code){
+//         throw new ExpressError(`Company with code ${code} already exists in database`, 404);
+//     }
+//     if (!name){
+//         throw new ExpressError(`Please provide name`, 404);
+//     }
+//     if (!description){
+//         throw new ExpressError(`Please provide description`, 404);
+//     }
+//     return res.json({"hello":"kidda"});
+//     const result = await db.query(`INSERT INTO companies (code, name, description) 
+//             VALUES ($1, $2, $3) RETURNING *`, [lowerCaseCode, name, description]);
+//     console.log(result.rows[0]);
+//     return res.status(201).json({company : result.rows[0]});
+//     }catch (e) {
+//         return next(e);
+//     }
+// });
+
+router.post("/", async(req,res,next)=>{
     try{
-    const {code, name, description } = req.body;
-    if (!code && !name && !description){
-        throw new ExpressError("please provide code, name and description", 404);
-    }
-    if (!code){
-        throw new ExpressError(`Please provide code`, 404);
-    }
-    if (!name){
-        throw new ExpressError(`Please provide name`, 404);
-    }
-    if (!description){
-        throw new ExpressError(`Please provide description`, 404);
-    }
-    lowerCaseCode = code.toLowerCase();
-    const test = await db.query(`SELECT code FROM companies WHERE code=$1`, [lowerCaseCode]);
-    if (lowerCaseCode == test.rows[0].code){
-        throw new ExpressError(`Company with code ${code} already exists in database`, 404);
-    }
-    const result = await db.query(`INSERT INTO companies (code, name, description) 
+        const { code, name, description } = req.body;
+        if (!code && !name && !description){
+            throw new ExpressError("please provide code, name and description", 404);
+        }
+        if (!code){
+            throw new ExpressError(`Please provide code`, 404);
+        }
+        let lowerCaseCode = code.toLowerCase();
+        const test = await db.query(`SELECT * FROM companies WHERE code=$1`, [lowerCaseCode]);
+        if (test.rows.length === 1){
+            throw new ExpressError(`Company with code ${code} already exists in database`, 404);
+        }
+        if (!name){
+            throw new ExpressError(`Please provide name`, 404);
+        }
+        if (!description){
+            throw new ExpressError(`Please provide description`, 404);
+        }
+        const result = await db.query(`INSERT INTO companies (code, name, description)
             VALUES ($1, $2, $3) RETURNING *`, [lowerCaseCode, name, description]);
-    return res.status(201).json({company : result.rows[0]});
-    }catch (e) {
+        return res.status(201).json({company : result.rows[0]});
+    }catch(e){
         return next(e);
     }
 });
+
 
 router.patch("/:code", async (req, res, next)=>{
     try{
